@@ -1,10 +1,9 @@
 package io;
 
-import model.DataStructure;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import model.DataStructure;
 
 public class Inputhandler {
 
@@ -53,43 +52,70 @@ public class Inputhandler {
             // ==============================================================
             int anzahl = dto.getAnzahl();
 
-            int[] hinweg = new int[anzahl*2];
-            int[] rueckweg = new int[anzahl*2];
+            int[] hinweg = new int[anzahl * 2 - 2];
+            int[] rueckweg = new int[anzahl * 2 - 2];
             String[] kollisionen = new String[anzahl - 1];
-            int wartezeitHin = 0;
-            int wartezeitRueck = 0;
+            int[] wartezeitHin = new int[anzahl];
+            int[] wartezeitRueck = new int[anzahl];
 
             // 1. Hinweg berechnen (Reguläre Fahrzeit + 1 Min Haltezeit)
             hinweg[0] = start; // Abfahrt am ersten Bahnhof (z.B. A)
             int temp = start;
 
-            for (int i = 1; i < anzahl; i++) {
+            for (int i = 1; i < anzahl-1; i++) {
                 int num = (temp + dto.getAbstaende()[i - 1]) % 60;
                 hinweg[2 * i - 1] = num;
                 hinweg[2 * i] = (num + 1) % 60;
 
                 temp = hinweg[2 * i];
             }
+            hinweg[hinweg.length - 1] =
+                    (hinweg[hinweg.length - 2] + dto.getAbstaende()[dto.getAbstaende().length - 1]) % 60;
 
-            int ankunftLetzterBahnhof = hinweg[2 * anzahl - 3];
-            int startRueck = (ankunftLetzterBahnhof + 1) % 60;
+            int startRueck = (hinweg[hinweg.length - 1] + 1) % 60;
 
-            rueckweg[2 * (anzahl - 1)] = startRueck;
+            rueckweg[rueckweg.length-1] = startRueck;
             int tempRueck = startRueck;
 
-            for (int i = anzahl - 2; i >= 0; i--) {
+            for (int i = anzahl - 2; i > 0; i--) {
                 int ankunft = (tempRueck + dto.getAbstaende()[i]) % 60;
-                rueckweg[2 * i + 1] = ankunft;
+                rueckweg[2 * i] = ankunft;
 
                 int abfahrt = (ankunft + 1) % 60;
-                rueckweg[2 * i] = abfahrt;
+                rueckweg[2 * i - 1] = abfahrt;
                 tempRueck = abfahrt;
             }
+            rueckweg[0] = (tempRueck + dto.getAbstaende()[0]) % 60;
 
             // 3. Kollisions-Array mit leeren Strings füllen (verhindert "null" bei der Ausgabe)
             for (int i = 0; i < kollisionen.length; i++) {
                 kollisionen[i] = "";
             }
+
+            int gesamtWartezeitHin = 0;
+            int gesamtWartezeitRueck = 0;
+            int gesamtdauerHin = -1;
+            int gesamtdauerRueck = -1;
+
+            for (int i = 0; i < dto.getAbstaende().length; i++) {
+                gesamtdauerHin += dto.getAbstaende()[i] + 1;
+
+                gesamtdauerRueck += dto.getAbstaende()[dto.getAbstaende().length - 1 - i] + 1;
+            }
+            if (dto.getWartezeitHin() != null) {
+                for (int i = 0; i < dto.getWartezeitHin().length; i++) {
+                    gesamtWartezeitHin += dto.getWartezeitHin()[i];
+                }
+            }
+            if (dto.getWartezeitRueck() != null) {
+                for (int i = 0; i < dto.getWartezeitHin().length; i++) {
+                    gesamtWartezeitRueck += dto.getWartezeitRueck()[i];
+                }
+            }
+
+            dto.setGesamtdauerHin(gesamtdauerHin + gesamtWartezeitHin);
+            dto.setGesamtdauerRueck(gesamtdauerRueck + gesamtWartezeitRueck);
+
 
             // 4. Alle vorbereiteten Arrays im DTO speichern
             dto.setHinweg(hinweg);

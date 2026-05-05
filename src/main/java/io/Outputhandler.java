@@ -1,26 +1,25 @@
 package io;
 
-import model.DataStructure;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import model.DataStructure;
 
 public class Outputhandler {
 
-    // Die globale Variable 'dto' wird nicht mehr benötigt,
-    // da wir die drei spezifischen DTOs direkt übergeben.
-
-    public void createOutput(DataStructure dtoEinfach, DataStructure dtoEinseitig, DataStructure dtoBeidseitig, String inputDatei) {
+    public void createOutput(DataStructure dtoEinfach, DataStructure dtoEinseitig, DataStructure dtoBeidseitig,
+            String inputDatei) {
         String outputDateiName;
         int dotIndex = inputDatei.lastIndexOf('.');
 
         // Namensgenerierung
+
+        String output = inputDatei.replaceFirst("^input/", "output/");
         if (dotIndex == -1) {
-            outputDateiName = inputDatei + "_output";
+            outputDateiName = output + "_aus.txt";
         } else {
-            String name = inputDatei.substring(0, dotIndex);
-            String endung = inputDatei.substring(dotIndex);
+            String name = output.substring(0, dotIndex);
+            String endung = output.substring(dotIndex);
             outputDateiName = name + "_output" + endung;
         }
 
@@ -45,8 +44,8 @@ public class Outputhandler {
             writer.println();
 
             // --- 2. Allgemeine Informationen ---
-            writer.println("Anzahl Bahnhöfe: " + dtoEinfach.getAnzahl());
-            writer.println("Mindestdauer   : " + dtoEinfach.getMinDauer());
+            writer.println("Anzahl Bahnhöfe : " + dtoEinfach.getAnzahl());
+            writer.println("Mindestdauer    : " + dtoEinfach.getMinDauer());
             writer.println();
 
             // --- 3. Strategien ausgeben ---
@@ -109,8 +108,12 @@ public class Outputhandler {
         for (int i = 0; i < anzahl; i++) {
             String name = dto.getStrecke()[i];
             // Wenn es eine Kollision nach diesem Bahnhof gibt, füge das " x" an
-            if (i < anzahl - 1 && kollisionen != null && !kollisionen[i].isEmpty()) {
-                name += kollisionen[i];
+            if (i < anzahl - 1) {
+                if (dto.getKollisionen()[i] == null) {
+                    name += "  "; // Platzhalter für die Ausrichtung
+                } else {
+                    name += dto.getKollisionen()[i];
+                }
             }
             writer.printf(colFormat, name);
         }
@@ -120,12 +123,12 @@ public class Outputhandler {
         writer.printf("%-4s", "Ab");
         writer.printf(colFormat, ""); // Zielbahnhof der Hinfahrt (Index 0) hat keine Abfahrt auf der Rückfahrt
         for (int i = 1; i < anzahl; i++) {
-            writer.printf(colFormat, formatZeit(rueckweg != null ? rueckweg[2 * i] : -1));
+            writer.printf(colFormat, formatZeit(rueckweg != null ? rueckweg[2 * i - 1] : -1));
         }
         writer.println();
 
         // 6. Zeile: Wartezeit Rückfahrt
-        writer.printf("%-4s", "Wa");
+        writer.printf("%-3s", "Wa");
         for (int i = 0; i < anzahl; i++) {
             writer.printf(colFormat, formatWartezeit(warteRueck != null ? warteRueck[i] : 0));
         }
@@ -134,7 +137,7 @@ public class Outputhandler {
         // 7. Zeile: Ankunft Rückfahrt (ungerader Index: 2*i + 1)
         writer.printf("%-4s", "An");
         for (int i = 0; i < anzahl - 1; i++) {
-            writer.printf(colFormat, formatZeit(rueckweg != null ? rueckweg[2 * i + 1] : -1));
+            writer.printf(colFormat, formatZeit(rueckweg != null ? rueckweg[2 * i] : -1));
         }
         writer.printf(colFormat, ""); // Startbahnhof der Rückfahrt hat keine Ankunft
         writer.println();
@@ -144,10 +147,19 @@ public class Outputhandler {
         // Wartezeiten aufsummieren
         int summeWaHin = 0;
         int summeWaRueck = 0;
-        if (warteHin != null) for (int w : warteHin) summeWaHin += w;
-        if (warteRueck != null) for (int w : warteRueck) summeWaRueck += w;
+        if (warteHin != null) {
+            for (int w : warteHin) {
+                summeWaHin += w;
+            }
+        }
+        if (warteRueck != null) {
+            for (int w : warteRueck) {
+                summeWaRueck += w;
+            }
+        }
 
-        writer.println("Gesamtdauer Hinfahrt, Rückfahrt       : " + dto.getGesamtdauerHin() + ", " + dto.getGesamtdauerRueck());
+        writer.println("Gesamtdauer Hinfahrt, Rückfahrt       : " + dto.getGesamtdauerHin() + ", "
+                + dto.getGesamtdauerRueck());
         writer.println("Summe Wartezeiten Hinfahrt, Rückfahrt : " + summeWaHin + ", " + summeWaRueck);
         writer.println("Summe Strafen                         : " + dto.getStrafen());
         writer.println();
@@ -156,12 +168,16 @@ public class Outputhandler {
 // --- Hilfsmethoden für die Formatierung ---
 
     private String formatZeit(int minuten) {
-        if (minuten < 0) return "";
+        if (minuten < 0) {
+            return "";
+        }
         return String.format("%02d", minuten % 60);
     }
 
     private String formatWartezeit(int wartezeit) {
-        if (wartezeit <= 0) return "";
+        if (wartezeit <= 0) {
+            return "";
+        }
         return String.format("(%02d)", wartezeit);
     }
 }

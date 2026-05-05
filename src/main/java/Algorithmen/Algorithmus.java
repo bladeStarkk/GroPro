@@ -16,31 +16,23 @@ public abstract class Algorithmus {
             int sicherheitHin = (endeHin + 1) % 60;
 
             int startRueck = dto.getRueckweg()[i * 2 + 1];
-            int endeRueck = dto.getRueckweg()[i * 2 + 2];
 
-            if (istZeitueberlappend(startHin, sicherheitHin, startRueck, endeRueck)) {
+            if (istZeitueberlappend(startHin, sicherheitHin, startRueck)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean istZeitueberlappend(int startHin, int endeHin, int startRueck, int endeRueck) {
+    private boolean istZeitueberlappend(int startHin, int endeHin, int startRueck) {
         int normiertesEndeHin;
         if (endeHin < startHin) {
             normiertesEndeHin = endeHin + 60;
         } else {
             normiertesEndeHin = endeHin;
         }
-        int[] zeitVerschiebungen = {0, 60, -60};
-
-        for (int verschiebung : zeitVerschiebungen) {
-            int verschobenerStartRueck = startRueck + verschiebung;
-            int verschobenesEndeRueck = (endeRueck < startRueck) ? endeRueck + 60 + verschiebung : endeRueck + verschiebung;
-
-            if (!(verschobenerStartRueck >= normiertesEndeHin || verschobenesEndeRueck <= startHin)) {
-                return true;
-            }
+        if(startRueck <= normiertesEndeHin && startRueck >= startHin) {
+            return true;
         }
         return false;
     }

@@ -27,10 +27,9 @@ public class DataStructure {
         copy.setStrafen(this.strafen);
         copy.setGesamtdauerHin(this.gesamtdauerHin);
         copy.setGesamtdauerRueck(this.gesamtdauerRueck);
-        copy.setWartezeitHin(this.wartezeitHin); //ToDo
-        copy.setWartezeitRueck(this.wartezeitRueck); //ToDo
 
-
+        if (this.wartezeitRueck != null) copy.setWartezeitHin(this.wartezeitRueck.clone());
+        if (this.wartezeitHin != null) copy.setWartezeitHin(this.wartezeitHin.clone());
         if (this.strecke != null) copy.setStrecke(this.strecke.clone());
         if (this.abstaende != null) copy.setAbstaende(this.abstaende.clone());
         if (this.hinweg != null) copy.setHinweg(this.hinweg.clone());

@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Datenstruktur, die alle relevanten Informationen für eine Zugstrecke
+ * und die Berechnungen der Algorithmen speichert.
+ */
 public class DataStructure {
 
     private String[] strecke;

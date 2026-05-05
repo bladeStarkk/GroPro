@@ -6,8 +6,19 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import model.DataStructure;
 
+/**
+ * Klasse zur Ausgabe der verarbeiteten Daten in eine Textdatei.
+ */
 public class Outputhandler {
 
+    /**
+     * Erstellt die Ausgabedatei mit den berechneten Fahrplänen aller Strategien.
+     *
+     * @param dtoEinfach   Die Datenstruktur der einfachen Fahrt.
+     * @param dtoEinseitig Die Datenstruktur des einseitigen Wartens.
+     * @param dtoBeidseitig Die Datenstruktur des beidseitigen Wartens.
+     * @param inputDatei   Der Dateiname der Eingabedatei, aus der der Ausgabename abgeleitet wird.
+     */
     public void createOutput(DataStructure dtoEinfach, DataStructure dtoEinseitig, DataStructure dtoBeidseitig,
             String inputDatei) {
         String outputDateiName;
@@ -24,7 +35,7 @@ public class Outputhandler {
             outputDateiName = name + "_output" + endung;
         }
 
-        try (PrintWriter writer = new PrintWriter(new File(outputDateiName))) {
+        try (PrintWriter writer = new PrintWriter(outputDateiName)) {
 
             // --- 1. Eingabedaten reproduzieren ---
             // Wir nehmen einfach dtoEinfach für die Grunddaten, da diese bei allen gleich sind.
@@ -71,6 +82,12 @@ public class Outputhandler {
         }
     }
 
+    /**
+     * Druckt den tabellarischen Fahrplan für eine bestimmte Strategie in den Writer.
+     *
+     * @param writer Der PrintWriter, der in die Zieldatei schreibt.
+     * @param dto    Die Datenstruktur mit den auszugebenden Fahrplandaten.
+     */
     private void druckeTabelle(PrintWriter writer, DataStructure dto) {
         int anzahl = dto.getStrecke().length;
         String colFormat = "%-6s";
@@ -80,7 +97,6 @@ public class Outputhandler {
         int[] rueckweg = dto.getRueckweg();
         int[] warteHin = dto.getWartezeitHin();
         int[] warteRueck = dto.getWartezeitRueck();
-        String[] kollisionen = dto.getKollisionen();
 
         // 1. Zeile: Ankunft Hinfahrt (ungerader Index: 2*i - 1)
         writer.printf("%-4s", "An");
@@ -91,7 +107,7 @@ public class Outputhandler {
         writer.println();
 
         // 2. Zeile: Wartezeit Hinfahrt
-        writer.printf("%-4s", "Wa");
+        writer.printf("%-3s", "Wa");
         for (int i = 0; i < anzahl; i++) {
             writer.printf(colFormat, formatWartezeit(warteHin != null ? warteHin[i] : 0));
         }
@@ -167,8 +183,12 @@ public class Outputhandler {
         writer.println();
     }
 
-// --- Hilfsmethoden für die Formatierung ---
-
+    /**
+     * Formatiert die Minutenangabe in eine zweistellige Stundenanzeige (modulo 60).
+     *
+     * @param minuten Die Minutenangabe, die formatiert werden soll.
+     * @return Ein String als zweistellige Anzeige oder ein leerer String bei negativer Eingabe.
+     */
     private String formatZeit(int minuten) {
         if (minuten < 0) {
             return "";
@@ -176,6 +196,12 @@ public class Outputhandler {
         return String.format("%02d", minuten % 60);
     }
 
+    /**
+     * Formatiert eine Wartezeit in Klammern.
+     *
+     * @param wartezeit Die Wartezeit in Minuten.
+     * @return Ein formatierter String mit eingeklammerter Wartezeit oder ein leerer String, wenn die Wartezeit <= 0 ist.
+     */
     private String formatWartezeit(int wartezeit) {
         if (wartezeit <= 0) {
             return "";

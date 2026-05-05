@@ -5,10 +5,20 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import model.DataStructure;
 
+/**
+ * Klasse zum Einlesen der Streckendaten und zur Initialisierung der grundlegenden Datenstrukturen.
+ */
 public class Inputhandler {
 
     private DataStructure dto;
 
+    /**
+     * Liest die angegebene Eingabedatei ein und erstellt das Basis-DataStructure-Objekt
+     * mit dem initialen (ungestörten) Fahrplan.
+     *
+     * @param file Die Eingabedatei, die die Streckeninformationen enthält.
+     * @return Ein initialisiertes DataStructure-Objekt mit grundlegenden Fahrplänen.
+     */
     public DataStructure createDto(File file) {
         dto = new DataStructure();
 
@@ -88,9 +98,7 @@ public class Inputhandler {
             rueckweg[0] = (tempRueck + dto.getAbstaende()[0]) % 60;
 
             // 3. Kollisions-Array mit leeren Strings füllen (verhindert "null" bei der Ausgabe)
-            for (int i = 0; i < kollisionen.length; i++) {
-                kollisionen[i] = "";
-            }
+            java.util.Arrays.fill(kollisionen, "");
 
             int gesamtWartezeitHin = 0;
             int gesamtWartezeitRueck = 0;

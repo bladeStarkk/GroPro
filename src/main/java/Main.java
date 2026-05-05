@@ -7,20 +7,28 @@ import io.Inputhandler;
 import io.Outputhandler;
 import model.DataStructure;
 
+/**
+ * Die Hauptklasse der Anwendung, die den Programmfluss steuert.
+ */
 public class Main {
 
-    private Inputhandler in;
 
-    private Outputhandler out;
-
+    /**
+     * Startpunkt der Anwendung.
+     * @param args Kommandozeilenargumente, erwartet den Dateipfad als erstes Argument.
+     */
     public static void main(String[] args) {
         Main app = new Main();
         app.run(args[0]);
     }
 
+    /**
+     * Führt die Hauptlogik der Anwendung aus.
+     * @param filePath Der Pfad der Eingabedatei ohne Dateiendung.
+     */
     private void run(String filePath) {
-        in = new Inputhandler();
-        out = new Outputhandler();
+        Inputhandler in = new Inputhandler();
+        Outputhandler out = new Outputhandler();
 
         File file = new File(filePath + ".txt");
         DataStructure dto = in.createDto(file);

@@ -2,9 +2,12 @@ package Algorithmen;
 
 import model.DataStructure;
 
+/**
+ * Algorithmus zur Berechnung der einfachen Fahrt ohne Wartezeiten.
+ * Markiert lediglich Kollisionen, ändert aber nicht den Fahrplan.
+ */
 public class EinfachAlg implements Algorithmus {
 
-    public DataStructure dto;
 
     @Override
     public DataStructure algorithmus(DataStructure dto) {
@@ -51,8 +54,9 @@ public class EinfachAlg implements Algorithmus {
             int sicherheitHin = (endeHin + 1) % 60;
 
             int startRueck = dto.getRueckweg()[i * 2 + 1];
+            int endeRueck = dto.getRueckweg()[i * 2];
 
-            if (istZeitueberlappend(startHin, sicherheitHin, startRueck)) {
+            if (istZeitueberlappend(startHin, sicherheitHin, startRueck, endeRueck)) {
                 return true;
             }
         }
@@ -60,16 +64,15 @@ public class EinfachAlg implements Algorithmus {
     }
 
     @Override
-    public boolean istZeitueberlappend(int startHin, int endeHin, int startRueck) {
-        int normiertesEndeHin;
-        if (endeHin < startHin) {
-            normiertesEndeHin = endeHin + 60;
-        } else {
-            normiertesEndeHin = endeHin;
-        }
-        if(startRueck < normiertesEndeHin && startRueck > startHin) {
-            return true;
-        }
-        return false;
+    public boolean istZeitueberlappend(int startHin, int endeHin, int startRueck, int endeRueck) {
+        // Diese Logik vergleicht die Block-Längen auf einem runden Ziffernblatt.
+        // Sie ist immun gegen den 60-Minuten-Sprung (z.B. von 55 auf 05 Uhr).
+        int lenHin = (endeHin - startHin + 60) % 60;
+        int lenRueck = (endeRueck - startRueck + 60) % 60;
+
+        int distHinToRueck = (startRueck - startHin + 60) % 60;
+        int distRueckToHin = (startHin - startRueck + 60) % 60;
+
+        return distHinToRueck < lenHin || distRueckToHin < lenRueck;
     }
 }

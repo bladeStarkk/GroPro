@@ -8,23 +8,20 @@ public class EinseitigAlg implements Algorithmus {
 
     @Override
     public DataStructure algorithmus(DataStructure dto) {
-        while (hatKollision(dto) == true) {
-            int anzahl = dto.getAnzahl();
-            int[] hinweg = dto.getHinweg();
-            int[] rueckweg = dto.getRueckweg();
+        int anzahl = dto.getAnzahl();
+        int[] warteZeitenRueck = new int[anzahl];
+        int[] hinweg = dto.getHinweg();
+        int[] rueckweg = dto.getRueckweg();
 
-            int[] warteZeitenRueck = new int[anzahl];
-            if(dto.getWartezeitRueck()!=null) {
-                warteZeitenRueck = dto.getWartezeitRueck();
-            }
+        while (hatKollision(dto)) {
 
             String[] kollisionen = new String[anzahl - 1];
-            for (int i = 0; i < anzahl-1; i++) {
+            for (int i = 0; i < anzahl - 1; i++) {
 
                 int startHin = hinweg[i * 2];
                 int endeHin = hinweg[i * 2 + 1];
 
-                int startRueck = rueckweg[i * 2+1];
+                int startRueck = rueckweg[i * 2 + 1];
 
                 int normiertesEndeHin;
 
@@ -33,21 +30,24 @@ public class EinseitigAlg implements Algorithmus {
                 } else {
                     normiertesEndeHin = endeHin;
                 }
-                if(startRueck <= normiertesEndeHin && startRueck >= startHin) {
+                if (startRueck <= normiertesEndeHin && startRueck >= startHin) {
                     kollisionen[i] = "  x";
                 }
             }
             for (int i = kollisionen.length - 1; i >= 0; i--) {
-                if(kollisionen[i] != null) {
+                if (kollisionen[i] != null) {
                     int temp;
 
-                    if (hinweg[2*i+1] < rueckweg[2*i+2]) temp = hinweg[2*i+1] + 60;
-                    else temp = hinweg[2*i+1];
+                    if (hinweg[2 * i + 1] < rueckweg[2 * i + 2]) {
+                        temp = hinweg[2 * i + 1] + 60;
+                    } else {
+                        temp = hinweg[2 * i + 1];
+                    }
 
-                    int diff = temp - rueckweg[2*i+2];
-                    warteZeitenRueck[i+1] += diff;
+                    int diff = temp - rueckweg[2 * i + 2];
+                    warteZeitenRueck[i + 1] += diff;
 
-                    for (int j = 2*i+1; j >= 0; j--) {
+                    for (int j = 2 * i + 1; j >= 0; j--) {
                         rueckweg[j] = (rueckweg[j] + diff) % 60;
                     }
                     dto.setRueckweg(rueckweg);
@@ -57,14 +57,15 @@ public class EinseitigAlg implements Algorithmus {
             }
         }
         int wartezeitRueckGesamt = 0;
-        for (int i = 0; i < dto.getWartezeitRueck().length; i++) {
-            wartezeitRueckGesamt += dto.getWartezeitRueck()[i];
+        for (int i = 0; i < warteZeitenRueck.length; i++) {
+            wartezeitRueckGesamt += warteZeitenRueck[i];
         }
         dto.setGesamtdauerRueck(dto.getGesamtdauerRueck() + wartezeitRueckGesamt);
-        dto.setStrafen(wartezeitRueckGesamt*wartezeitRueckGesamt);
+        dto.setStrafen(wartezeitRueckGesamt * wartezeitRueckGesamt);
 
         return dto;
     }
+
     @Override
     public boolean hatKollision(DataStructure dto) {
 
@@ -83,6 +84,7 @@ public class EinseitigAlg implements Algorithmus {
         }
         return false;
     }
+
     @Override
     public boolean istZeitueberlappend(int startHin, int endeHin, int startRueck) {
         int normiertesEndeHin;
@@ -91,9 +93,6 @@ public class EinseitigAlg implements Algorithmus {
         } else {
             normiertesEndeHin = endeHin;
         }
-        if(startRueck < normiertesEndeHin && startRueck > startHin) {
-            return true;
-        }
-        return false;
+        return startRueck < normiertesEndeHin && startRueck > startHin;
     }
 }

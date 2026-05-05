@@ -38,14 +38,14 @@ Summe Strafen                         : 64
 
 Beidseitiges Warten:
 An        29    38    53    57    03    25    39    46    55    
-Wa                                                              
+Wa                                                        (05)  
 Ab  17    30    39    54    58    04    26    40    47          
     A     B     C     D     E     F     G     H     I     J     
-Ab        22    13    58    54    48    26    12    05    56    
-Wa                                                             
-An  34    21    12    57    53    47    25    11    04          
+Ab        32    19    04    00    48    26    12    05    56    
+Wa                                                       (05)  
+An  44    27    18    03    53    47    25    11    04          
 
-Gesamtdauer Hinfahrt, Rückfahrt       : 98, 98
-Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
-Summe Strafen                         : 0
+Gesamtdauer Hinfahrt, Rückfahrt       : 103, 103
+Summe Wartezeiten Hinfahrt, Rückfahrt : 5, 5
+Summe Strafen                         : 50
 

@@ -3,6 +3,7 @@ package io;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import model.DataStructure;
 
 public class Outputhandler {
@@ -63,6 +64,7 @@ public class Outputhandler {
             druckeTabelle(writer, dtoBeidseitig);
 
             System.out.println("Output erfolgreich generiert: " + outputDateiName);
+            System.out.println(Arrays.toString(dtoEinfach.getKollisionen()));
 
         } catch (IOException e) {
             System.err.println("Kritischer Fehler beim Schreiben der Datei " + outputDateiName + ": " + e.getMessage());

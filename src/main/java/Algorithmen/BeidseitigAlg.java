@@ -2,7 +2,7 @@ package Algorithmen;
 
 import model.DataStructure;
 
-public class BeidseitigAlg extends Algorithmus {
+public class BeidseitigAlg implements Algorithmus {
 
     public DataStructure dto;
 
@@ -11,5 +11,15 @@ public class BeidseitigAlg extends Algorithmus {
         this.dto = dto;
         // Implementation for "Beide" logic
         return this.dto;
+    }
+
+    @Override
+    public boolean hatKollision(DataStructure dto) {
+        return false;
+    }
+
+    @Override
+    public boolean istZeitueberlappend(int startHin, int endeHin, int startRueck) {
+        return false;
     }
 }

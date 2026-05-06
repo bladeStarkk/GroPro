@@ -37,15 +37,15 @@ Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 16
 Summe Strafen                         : 256
 
 Beidseitiges Warten:
-An        22    31    46    54    58    01    
-Wa             (08)                          
-Ab  17    23    40    47    55    59          
+An        22    31    38    46    50    53    
+Wa                                           
+Ab  17    23    32    39    47    51          
     A     B     C     D     E     F     G     
-Ab        41    32    17    09    05    02    
-Wa             (08)                          
-An  46    40    23    16    08    04          
+Ab        41    32    25    17    13    10    
+Wa                                           
+An  46    40    31    24    16    12          
 
-Gesamtdauer Hinfahrt, Rückfahrt       : 44, 44
-Summe Wartezeiten Hinfahrt, Rückfahrt : 8, 8
-Summe Strafen                         : 128
+Gesamtdauer Hinfahrt, Rückfahrt       : 36, 36
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
 

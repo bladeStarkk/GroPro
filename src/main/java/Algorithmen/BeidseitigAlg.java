@@ -3,25 +3,61 @@ package Algorithmen;
 import model.DataStructure;
 
 /**
- * Algorithmus zur Kollisionsauflösung durch beidseitiges Warten. Bei diesem Ansatz werden die Wartezeiten möglichst
- * gleichmäßig auf Hinfahrt und Rückfahrt aufgeteilt (50/50-Verteilung). Dies minimiert die quadratischen Strafkosten im
- * Vergleich zum einseitigen Warten.
- *
- * @see Algorithmus
- * @see EinseitigAlg
+ * Algorithmus zur Kollisionsauflösung durch beidseitiges Warten.
+ * Bei diesem Ansatz wird zunächst der optimale Shift (0-59 Minuten) für den gesamten Rückweg gesucht,
+ * um die initialen Kollisionen zu minimieren. Der Shift ist planmäßig und wird nicht als Wartezeit bestraft.
+ * Danach werden die restlichen (unvermeidbaren) Wartezeiten möglichst gleichmäßig auf Hinfahrt und
+ * Rückfahrt aufgeteilt (50/50-Verteilung).
  */
 public class BeidseitigAlg implements Algorithmus {
 
     /**
-     * {@inheritDoc} Nutzt zunächst den {@link EinseitigAlg} auf einer Kopie, um die benötigten Wartezeiten zu
-     * ermitteln. Diese werden dann hälftig auf Hin- und Rückfahrt verteilt. Die Strafen werden als Summe der
-     * quadrierten Wartezeiten beider Richtungen berechnet.
+     * Führt den Hauptalgorithmus zur Kollisionsauflösung aus.
+     * Sucht den optimalen Shift für den Rückweg und teilt anfallende Wartezeiten
+     * gleichmäßig zwischen Hinfahrt und Rückfahrt auf.
+     *
+     * @param dto Die aktuelle Datenstruktur mit den Fahrplaninformationen.
+     * @return Die aktualisierte Datenstruktur mit dem konfliktfreien Fahrplan.
      */
     @Override
     public DataStructure algorithmus(DataStructure dto) {
         if (!hatKollision(dto)) {
             return dto;
         }
+
+        int bestShift = 0;
+        int minWartezeit = Integer.MAX_VALUE;
+
+        for (int shift = 0; shift < 60; shift++) {
+            DataStructure testDto = dto.deepCopy();
+
+            int[] testRueck = testDto.getRueckweg().clone();
+            for (int j = 0; j < testRueck.length; j++) {
+                testRueck[j] = (testRueck[j] + shift) % 60;
+            }
+            testDto.setRueckweg(testRueck);
+
+            EinseitigAlg testAlg = new EinseitigAlg();
+            DataStructure resultDto = testAlg.algorithmus(testDto);
+
+            int wartezeit = 0;
+            if (resultDto.getWartezeitRueck() != null) {
+                for (int w : resultDto.getWartezeitRueck()) {
+                    wartezeit += w;
+                }
+            }
+
+            if (wartezeit < minWartezeit) {
+                minWartezeit = wartezeit;
+                bestShift = shift;
+            }
+        }
+
+        int[] bestShiftRueckweg = dto.getRueckweg().clone();
+        for (int j = 0; j < bestShiftRueckweg.length; j++) {
+            bestShiftRueckweg[j] = (bestShiftRueckweg[j] + bestShift) % 60;
+        }
+        dto.setRueckweg(bestShiftRueckweg);
 
         int anzahl = dto.getAnzahl();
         int umstiegszeit = dto.getUmstiegszeit();
@@ -64,9 +100,9 @@ public class BeidseitigAlg implements Algorithmus {
         dto.setWartezeitHin(warteHin);
 
         int[] rueckweg = dto.getRueckweg().clone();
-
         int letzteAnkunftHin = hinweg[(anzahl - 2) * 2 + 1];
-        int zeitRueck = (letzteAnkunftHin + 1) % 60;
+
+        int zeitRueck = (letzteAnkunftHin + 1 + bestShift) % 60;
 
         for (int i = anzahl - 2; i >= 0; i--) {
             if (i < anzahl - 2) {
@@ -89,7 +125,10 @@ public class BeidseitigAlg implements Algorithmus {
     }
 
     /**
-     * {@inheritDoc}
+     * Prüft, ob im aktuellen Fahrplan Kollisionen auf eingleisigen Strecken vorliegen.
+     *
+     * @param dto Die aktuelle Datenstruktur mit den Fahrplaninformationen.
+     * @return true, wenn eine Kollision existiert, andernfalls false.
      */
     @Override
     public boolean hatKollision(DataStructure dto) {
@@ -112,12 +151,16 @@ public class BeidseitigAlg implements Algorithmus {
     }
 
     /**
-     * {@inheritDoc}
+     * Überprüft, ob sich zwei Zeitintervalle innerhalb eines 60-Minuten-Rasters überschneiden.
+     *
+     * @param startHin Startzeit der Hinfahrt.
+     * @param endeHin  Endzeit der Hinfahrt.
+     * @param startRueck Startzeit der Rückfahrt.
+     * @param endeRueck  Endzeit der Rückfahrt.
+     * @return true, wenn die Intervalle überlappen, andernfalls false.
      */
     @Override
     public boolean istZeitueberlappend(int startHin, int endeHin, int startRueck, int endeRueck) {
-        // Diese Logik vergleicht die Block-Längen auf einem runden Ziffernblatt.
-        // Sie ist immun gegen den 60-Minuten-Sprung (z.B. von 55 auf 05 Uhr).
         int lenHin = (endeHin - startHin + 60) % 60;
         int lenRueck = (endeRueck - startRueck + 60) % 60;
 

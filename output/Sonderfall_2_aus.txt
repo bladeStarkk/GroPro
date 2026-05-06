@@ -1,0 +1,51 @@
+Strecke:
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+Abstaende:
+1 2 1 3 1 2 1 3 1 2 1 3 1 2 1 1 1 1 1 2 1 2 1 3 1
+
+Start Hinfahrt:
+18
+
+Anzahl Bahnhöfe : 26
+Mindestdauer    : 63
+
+Einfache Fahrt:
+An        19    22    24    28    30    33    35    39    41    44    46    50    52    55    57    59    01    03    05    08    10    13    15    19    21    
+Wa                                                                                                                                                             
+Ab  18    20    23    25    29    31    34    36    40    42    45    47    51    53    56    58    00    02    04    06    09    11    14    16    20          
+    A     B  x  C     D     E     F     G     H     I     J     K     L     M  x  N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
+Ab        24    21    19    15    13    10    08    04    02    59    57    53    51    48    46    44    42    40    38    35    33    30    28    24    22    
+Wa                                                                                                                                                             
+An  25    23    20    18    14    12    09    07    03    01    58    56    52    50    47    45    43    41    39    37    34    32    29    27    23          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 63, 63
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+
+Einseitiges Warten:
+An        19    22    24    28    30    33    35    39    41    44    46    50    52    55    57    59    01    03    05    08    10    13    15    19    21    
+Wa                                                                                                                                                             
+Ab  18    20    23    25    29    31    34    36    40    42    45    47    51    53    56    58    00    02    04    06    09    11    14    16    20          
+    A     B     C     D     E     F     G     H     I     J     K     L     M     N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
+Ab        26    23    21    17    15    12    10    06    04    01    59    55    53    48    46    44    42    40    38    35    33    30    28    24    22    
+Wa                                                                               (02)                                                                          
+An  27    25    22    20    16    14    11    09    05    03    00    58    54    50    47    45    43    41    39    37    34    32    29    27    23          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 63, 65
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 2
+Summe Strafen                         : 4
+
+Beidseitiges Warten:
+An        19    22    24    28    30    33    35    39    41    44    46    50    52    56    58    00    02    04    06    09    11    14    16    20    22    
+Wa                                                                               (01)                                                                          
+Ab  18    20    23    25    29    31    34    36    40    42    45    47    51    54    57    59    01    03    05    07    10    12    15    17    21          
+    A     B     C     D     E     F     G     H     I     J     K     L     M     N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
+Ab        26    23    21    17    15    12    10    06    04    01    59    55    53    49    47    45    43    41    39    36    34    31    29    25    23    
+Wa                                                                               (01)                                                                          
+An  27    25    22    20    16    14    11    09    05    03    00    58    54    51    48    46    44    42    40    38    35    33    30    28    24          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 64, 64
+Summe Wartezeiten Hinfahrt, Rückfahrt : 1, 1
+Summe Strafen                         : 2
+

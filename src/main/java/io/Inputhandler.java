@@ -2,103 +2,153 @@ package io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import model.DataStructure;
 
 /**
- * Klasse zum Einlesen der Streckendaten und zur Initialisierung der grundlegenden Datenstrukturen.
+ * Handler zum Einlesen von Streckendaten aus einer Textdatei. Diese Klasse liest die Eingabedatei im vorgegebenen
+ * Format ein und erstellt eine initialisierte {@link DataStructure} mit dem Grundfahrplan für Hin- und Rückfahrt.
  */
 public class Inputhandler {
 
+    /** Die zu erstellende Datenstruktur. */
     private DataStructure dto;
 
     /**
-     * Liest die angegebene Eingabedatei ein und erstellt das Basis-DataStructure-Objekt
-     * mit dem initialen (ungestörten) Fahrplan.
+     * Liest die Eingabedatei und erstellt die Basis-Datenstruktur. Das erwartete Dateiformat:
+     * Strecke: A B C D E
      *
-     * @param file Die Eingabedatei, die die Streckeninformationen enthält.
-     * @return Ein initialisiertes DataStructure-Objekt mit grundlegenden Fahrplänen.
+     * Abstaende: 1 2 3 4
+     *
+     * Start Hinfahrt: 10
+     *
+     * @param file die Eingabedatei mit Streckeninformationen
+     * @return eine initialisierte {@link DataStructure} mit Grundfahrplan
      */
     public DataStructure createDto(File file) {
         dto = new DataStructure();
 
         try (Scanner scanner = new Scanner(file)) {
-            // Zeile 1: "Strecke:" (ignorieren)
-            scanner.nextLine();
 
-            // Zeile 2: Bahnhöfe
+            // 1. PRÜFUNG: Ist die Datei komplett leer?
+            if (!scanner.hasNextLine()) {
+                ExceptionHandler.handle("Die Eingabedatei ist komplett leer: " + file.getPath());
+            }
+
+            scanner.nextLine(); // "Strecke:" überspringen
+
+            // 2. PRÜFUNG: Ist die Liste der Bahnhöfe leer?
             String streckenZeile = scanner.nextLine().trim();
+            if (streckenZeile.isEmpty()) {
+                ExceptionHandler.handle("Fehler: Die Liste der Bahnhöfe (Strecke) ist leer.");
+            }
+
             dto.setStrecke(streckenZeile.split(" "));
             dto.setAnzahl(dto.getStrecke().length);
 
-            // Zeile 3: leer, Zeile 4: "Abstaende:" (ignorieren)
-            scanner.nextLine();
-            scanner.nextLine();
+            scanner.nextLine(); // Leerzeile
+            scanner.nextLine(); // "Abstaende:" überspringen
 
-            // Zeile 5: Abstände
-            String[] abstaendeStr = scanner.nextLine().trim().split(" ");
+            // 3. PRÜFUNG: Ist die Liste der Abstände leer?
+            String abstaendeZeile = scanner.nextLine().trim();
+            if (abstaendeZeile.isEmpty()) {
+                ExceptionHandler.handle("Fehler: Die Liste der Abstände ist leer.");
+            }
+
+            String[] abstaendeStr = abstaendeZeile.split(" ");
+
+            // 4. PRÜFUNG: Anzahl Abstände = Anzahl Bahnhöfe - 1?
+            if (abstaendeStr.length != dto.getAnzahl() - 1) {
+                ExceptionHandler.handle("Logikfehler: Die Anzahl der Abstände (" + abstaendeStr.length +
+                        ") muss genau der Anzahl der Bahnhöfe minus 1 (" + (dto.getAnzahl() - 1) + ") entsprechen.");
+            }
+
             int[] abstaende = new int[abstaendeStr.length];
             int summeAbstaende = 0;
+            int sicherheitszeit = 1; // Für die Validierung benötigt
+
             for (int i = 0; i < abstaendeStr.length; i++) {
-                abstaende[i] = Integer.parseInt(abstaendeStr[i]);
+                // 5. PRÜFUNG: Sind die Abstände gültige Zahlen? (NumberFormatException)
+                try {
+                    abstaende[i] = Integer.parseInt(abstaendeStr[i]);
+                } catch (NumberFormatException e) {
+                    ExceptionHandler.handle(e, "Formatfehler: Der Abstand '" + abstaendeStr[i] + "' ist keine gültige Ganzzahl.");
+                }
+
+                // 6. PRÜFUNG: Abstände dürfen nicht negativ sein
+                if (abstaende[i] < 0) {
+                    ExceptionHandler.handle("Wertefehler: Ein Abstand darf nicht negativ sein (Gefunden: " + abstaende[i] + ").");
+                }
+
+                // 7. PRÜFUNG: Abstand/Fahrzeit > (30 - Sicherheitszeit)
+                if (abstaende[i] > (30 - sicherheitszeit)) {
+                    ExceptionHandler.handle("Regelverletzung: Der Abstand (Fahrzeit) zwischen zwei Bahnhöfen ist zu groß: "
+                            + abstaende[i] + " (Maximal erlaubt: " + (30 - sicherheitszeit) + ").");
+                }
+
                 summeAbstaende += abstaende[i];
             }
             dto.setAbstaende(abstaende);
 
-            // Mindestdauer berechnen: Summe der Abstände + Haltezeiten an ZWISCHENbahnhöfen (Anzahl - 2)
             int haltezeiten = dto.getAnzahl() - 2;
             dto.setMinDauer(summeAbstaende + haltezeiten);
 
-            // Zeile 6: leer, Zeile 7: "Start Hinfahrt:" (ignorieren)
-            scanner.nextLine();
-            scanner.nextLine();
+            scanner.nextLine(); // Leerzeile
+            scanner.nextLine(); // "Start Hinfahrt:" überspringen
 
-            // Zeile 8: Startzeit
-            int start = Integer.parseInt(scanner.nextLine().trim());
+            // 8. PRÜFUNG: Ist die Startzeit eine gültige Zahl? (NumberFormatException)
+            String startZeile = scanner.nextLine().trim();
+            int start = 0;
+            try {
+                start = Integer.parseInt(startZeile);
+            } catch (NumberFormatException e) {
+                ExceptionHandler.handle(e, "Formatfehler: Die Startzeit '" + startZeile + "' ist keine gültige Ganzzahl.");
+            }
+
+            // 9. PRÜFUNG: Startzeit darf nicht negativ sein
+            if (start < 0) {
+                ExceptionHandler.handle("Wertefehler: Die Startzeit darf nicht negativ sein (Gefunden: " + start + ").");
+            }
+
             dto.setStart(start);
 
-            // ==============================================================
-            // NEU: ARRAYS INITIALISIEREN & GRUNDFAHRPLAN (HIN/RÜCK) BAUEN
-            // ==============================================================
-            int anzahl = dto.getAnzahl();
+            // --- Ab hier läuft dein originaler Logik-Code unberührt weiter ---
 
+            int anzahl = dto.getAnzahl();
             int[] hinweg = new int[anzahl * 2 - 2];
             int[] rueckweg = new int[anzahl * 2 - 2];
             String[] kollisionen = new String[anzahl - 1];
             int[] wartezeitHin = new int[anzahl];
             int[] wartezeitRueck = new int[anzahl];
 
-            // 1. Hinweg berechnen (Reguläre Fahrzeit + 1 Min Haltezeit)
-            hinweg[0] = start; // Abfahrt am ersten Bahnhof (z.B. A)
+            hinweg[0] = start;
             int temp = start;
 
-            for (int i = 1; i < anzahl-1; i++) {
+            for (int i = 1; i < anzahl - 1; i++) {
                 int num = (temp + dto.getAbstaende()[i - 1]) % 60;
                 hinweg[2 * i - 1] = num;
                 hinweg[2 * i] = (num + 1) % 60;
-
                 temp = hinweg[2 * i];
             }
             hinweg[hinweg.length - 1] =
                     (hinweg[hinweg.length - 2] + dto.getAbstaende()[dto.getAbstaende().length - 1]) % 60;
 
             int startRueck = (hinweg[hinweg.length - 1] + 1) % 60;
-
-            rueckweg[rueckweg.length-1] = startRueck;
+            rueckweg[rueckweg.length - 1] = startRueck;
             int tempRueck = startRueck;
 
             for (int i = anzahl - 2; i > 0; i--) {
                 int ankunft = (tempRueck + dto.getAbstaende()[i]) % 60;
                 rueckweg[2 * i] = ankunft;
-
                 int abfahrt = (ankunft + 1) % 60;
                 rueckweg[2 * i - 1] = abfahrt;
                 tempRueck = abfahrt;
             }
             rueckweg[0] = (tempRueck + dto.getAbstaende()[0]) % 60;
 
-            // 3. Kollisions-Array mit leeren Strings füllen (verhindert "null" bei der Ausgabe)
-            java.util.Arrays.fill(kollisionen, "");
+            Arrays.fill(kollisionen, "");
 
             int gesamtWartezeitHin = 0;
             int gesamtWartezeitRueck = 0;
@@ -107,16 +157,16 @@ public class Inputhandler {
 
             for (int i = 0; i < dto.getAbstaende().length; i++) {
                 gesamtdauerHin += dto.getAbstaende()[i] + 1;
-
                 gesamtdauerRueck += dto.getAbstaende()[dto.getAbstaende().length - 1 - i] + 1;
             }
+
             if (dto.getWartezeitHin() != null) {
                 for (int i = 0; i < dto.getWartezeitHin().length; i++) {
                     gesamtWartezeitHin += dto.getWartezeitHin()[i];
                 }
             }
             if (dto.getWartezeitRueck() != null) {
-                for (int i = 0; i < dto.getWartezeitHin().length; i++) {
+                for (int i = 0; i < dto.getWartezeitRueck().length; i++) {
                     gesamtWartezeitRueck += dto.getWartezeitRueck()[i];
                 }
             }
@@ -124,17 +174,19 @@ public class Inputhandler {
             dto.setGesamtdauerHin(gesamtdauerHin + gesamtWartezeitHin);
             dto.setGesamtdauerRueck(gesamtdauerRueck + gesamtWartezeitRueck);
 
-
-            // 4. Alle vorbereiteten Arrays im DTO speichern
             dto.setHinweg(hinweg);
             dto.setRueckweg(rueckweg);
             dto.setKollisionen(kollisionen);
             dto.setWartezeitHin(wartezeitHin);
             dto.setWartezeitRueck(wartezeitRueck);
             dto.setStrafen(0);
+            dto.setSicherheitszeit(1);
+            dto.setUmstiegszeit(1);
 
         } catch (FileNotFoundException e) {
-            System.err.println("Datei nicht gefunden: " + e.getMessage());
+            ExceptionHandler.handle(e, "Datei nicht gefunden: " + file.getPath());
+        } catch (NoSuchElementException e) {
+            ExceptionHandler.handle(e, "Formatfehler: Die Datei ist unvollständig oder hat nicht die erwartete Anzahl an Zeilen.");
         }
 
         return dto;

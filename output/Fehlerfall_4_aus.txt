@@ -1,0 +1,3 @@
+=== FEHLERBERICHT ===
+Kontext: Logikfehler: Die Anzahl der Abstände (4) muss genau der Anzahl der Bahnhöfe minus 1 (1) entsprechen.
+=====================

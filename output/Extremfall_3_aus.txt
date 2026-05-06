@@ -1,0 +1,51 @@
+Strecke:
+A B
+
+Abstaende:
+5
+
+Start Hinfahrt:
+11
+
+Anzahl Bahnhöfe : 2
+Mindestdauer    : 5
+
+Einfache Fahrt:
+An        16    
+Wa             
+Ab  11          
+    A     B     
+Ab        17    
+Wa             
+An  22          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 5, 5
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+
+Einseitiges Warten:
+An        16    
+Wa             
+Ab  11          
+    A     B     
+Ab        17    
+Wa             
+An  22          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 5, 5
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+
+Beidseitiges Warten:
+An        16    
+Wa             
+Ab  11          
+    A     B     
+Ab        17    
+Wa             
+An  22          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 5, 5
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+

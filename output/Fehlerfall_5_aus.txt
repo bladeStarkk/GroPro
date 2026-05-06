@@ -1,0 +1,3 @@
+=== FEHLERBERICHT ===
+Kontext: Regelverletzung: Der Abstand (Fahrzeit) zwischen zwei Bahnhöfen ist zu groß: 30 (Maximal erlaubt: 29).
+=====================

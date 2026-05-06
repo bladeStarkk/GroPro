@@ -1,30 +1,33 @@
 package io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import model.DataStructure;
 
 /**
- * Klasse zur Ausgabe der verarbeiteten Daten in eine Textdatei.
+ * Handler zur Ausgabe der berechneten Fahrpläne in eine Textdatei. Diese Klasse erstellt eine formatierte Ausgabedatei
+ * mit den Ergebnissen aller drei Algorithmen (Einfach, Einseitig, Beidseitig) sowie den zugehörigen Metriken wie
+ * Wartezeiten und Strafpunkten.
+ *
+ * @see DataStructure
  */
 public class Outputhandler {
 
     /**
-     * Erstellt die Ausgabedatei mit den berechneten Fahrplänen aller Strategien.
+     * Erstellt die Ausgabedatei mit den Fahrplänen aller Strategien. Die Ausgabe enthält: Reproduktion der
+     * Eingabedaten, Allgemeine Streckeninformationen, Tabellarische Fahrpläne für jede Strategie, Metriken pro
+     * Strategie (Dauer, Wartezeiten, Strafen)
      *
-     * @param dtoEinfach   Die Datenstruktur der einfachen Fahrt.
-     * @param dtoEinseitig Die Datenstruktur des einseitigen Wartens.
-     * @param dtoBeidseitig Die Datenstruktur des beidseitigen Wartens.
-     * @param inputDatei   Der Dateiname der Eingabedatei, aus der der Ausgabename abgeleitet wird.
+     * @param dtoEinfach Ergebnis des einfachen Algorithmus
+     * @param dtoEinseitig Ergebnis des einseitigen Warten-Algorithmus
+     * @param dtoBeidseitig Ergebnis des beidseitigen Warten-Algorithmus
+     * @param inputDatei Pfad der Eingabedatei zur Ableitung des Ausgabenamens
      */
     public void createOutput(DataStructure dtoEinfach, DataStructure dtoEinseitig, DataStructure dtoBeidseitig,
             String inputDatei) {
         String outputDateiName;
         int dotIndex = inputDatei.lastIndexOf('.');
-
-        // Namensgenerierung
 
         String output = inputDatei.replaceFirst("^input/", "output/");
         if (dotIndex == -1) {
@@ -32,13 +35,10 @@ public class Outputhandler {
         } else {
             String name = output.substring(0, dotIndex);
             String endung = output.substring(dotIndex);
-            outputDateiName = name + "_output" + endung;
+            outputDateiName = name + "_aus" + endung;
         }
 
         try (PrintWriter writer = new PrintWriter(outputDateiName)) {
-
-            // --- 1. Eingabedaten reproduzieren ---
-            // Wir nehmen einfach dtoEinfach für die Grunddaten, da diese bei allen gleich sind.
             writer.println("Strecke:");
             writer.println(String.join(" ", dtoEinfach.getStrecke()));
             writer.println();
@@ -55,22 +55,16 @@ public class Outputhandler {
             writer.println(dtoEinfach.getStart());
             writer.println();
 
-            // --- 2. Allgemeine Informationen ---
             writer.println("Anzahl Bahnhöfe : " + dtoEinfach.getAnzahl());
             writer.println("Mindestdauer    : " + dtoEinfach.getMinDauer());
             writer.println();
 
-            // --- 3. Strategien ausgeben ---
-
-            // 3.1 Einfache Fahrt
             writer.println("Einfache Fahrt:");
             druckeTabelle(writer, dtoEinfach);
 
-            // 3.2 Einseitiges Warten
             writer.println("Einseitiges Warten:");
             druckeTabelle(writer, dtoEinseitig);
 
-            // 3.3 Beidseitiges Warten
             writer.println("Beidseitiges Warten:");
             druckeTabelle(writer, dtoBeidseitig);
 
@@ -78,57 +72,52 @@ public class Outputhandler {
             System.out.println(Arrays.toString(dtoEinfach.getKollisionen()));
 
         } catch (IOException e) {
-            System.err.println("Kritischer Fehler beim Schreiben der Datei " + outputDateiName + ": " + e.getMessage());
+            ExceptionHandler.handle(e, "Fehler beim Schreiben der Ausgabedatei");
         }
     }
 
     /**
-     * Druckt den tabellarischen Fahrplan für eine bestimmte Strategie in den Writer.
+     * Druckt den tabellarischen Fahrplan einer Strategie. Die Tabelle zeigt Ankunfts- und Abfahrtszeiten sowie
+     * Wartezeiten für Hin- und Rückfahrt an allen Bahnhöfen. Kollisionen werden mit einem "x" markiert.
      *
-     * @param writer Der PrintWriter, der in die Zieldatei schreibt.
-     * @param dto    Die Datenstruktur mit den auszugebenden Fahrplandaten.
+     * @param writer der PrintWriter für die Ausgabedatei
+     * @param dto die Datenstruktur mit den Fahrplandaten
      */
     private void druckeTabelle(PrintWriter writer, DataStructure dto) {
         int anzahl = dto.getStrecke().length;
         String colFormat = "%-6s";
 
-        // Arrays sicherheitshalber auslesen (Null-Checks)
         int[] hinweg = dto.getHinweg();
         int[] rueckweg = dto.getRueckweg();
         int[] warteHin = dto.getWartezeitHin();
         int[] warteRueck = dto.getWartezeitRueck();
 
-        // 1. Zeile: Ankunft Hinfahrt (ungerader Index: 2*i - 1)
         writer.printf("%-4s", "An");
-        writer.printf(colFormat, ""); // Erster Bahnhof hat keine Ankunft
+        writer.printf(colFormat, "");
         for (int i = 1; i < anzahl; i++) {
             writer.printf(colFormat, formatZeit(hinweg != null ? hinweg[2 * i - 1] : -1));
         }
         writer.println();
 
-        // 2. Zeile: Wartezeit Hinfahrt
         writer.printf("%-3s", "Wa");
         for (int i = 0; i < anzahl; i++) {
             writer.printf(colFormat, formatWartezeit(warteHin != null ? warteHin[i] : 0));
         }
         writer.println();
 
-        // 3. Zeile: Abfahrt Hinfahrt (gerader Index: 2*i)
         writer.printf("%-4s", "Ab");
         for (int i = 0; i < anzahl - 1; i++) {
             writer.printf(colFormat, formatZeit(hinweg != null ? hinweg[2 * i] : -1));
         }
-        writer.printf(colFormat, ""); // Letzter Bahnhof hat keine Abfahrt auf der Hinfahrt
+        writer.printf(colFormat, "");
         writer.println();
 
-        // 4. Zeile: Bahnhöfe (inklusive Kollisionsmarker " x")
         writer.printf("%-4s", "");
         for (int i = 0; i < anzahl; i++) {
             String name = dto.getStrecke()[i];
-            // Wenn es eine Kollision nach diesem Bahnhof gibt, füge das " x" an
             if (i < anzahl - 1) {
                 if (dto.getKollisionen()[i] == null) {
-                    name += "  "; // Platzhalter für die Ausrichtung
+                    name += "  ";
                 } else {
                     name += dto.getKollisionen()[i];
                 }
@@ -137,34 +126,30 @@ public class Outputhandler {
         }
         writer.println();
 
-        // 5. Zeile: Abfahrt Rückfahrt (gerader Index: 2*i)
         writer.printf("%-4s", "Ab");
-        writer.printf(colFormat, ""); // Zielbahnhof der Hinfahrt (Index 0) hat keine Abfahrt auf der Rückfahrt
+        writer.printf(colFormat, "");
         for (int i = 1; i < anzahl; i++) {
             writer.printf(colFormat, formatZeit(rueckweg != null ? rueckweg[2 * i - 1] : -1));
         }
         writer.println();
 
-        // 6. Zeile: Wartezeit Rückfahrt
         writer.printf("%-3s", "Wa");
         for (int i = 0; i < anzahl; i++) {
             writer.printf(colFormat, formatWartezeit(warteRueck != null ? warteRueck[i] : 0));
         }
         writer.println();
 
-        // 7. Zeile: Ankunft Rückfahrt (ungerader Index: 2*i + 1)
         writer.printf("%-4s", "An");
         for (int i = 0; i < anzahl - 1; i++) {
             writer.printf(colFormat, formatZeit(rueckweg != null ? rueckweg[2 * i] : -1));
         }
-        writer.printf(colFormat, ""); // Startbahnhof der Rückfahrt hat keine Ankunft
+        writer.printf(colFormat, "");
         writer.println();
         writer.println();
 
-        // --- 8. Abschluss-Metriken ---
-        // Wartezeiten aufsummieren
         int summeWaHin = 0;
         int summeWaRueck = 0;
+
         if (warteHin != null) {
             for (int w : warteHin) {
                 summeWaHin += w;
@@ -184,10 +169,10 @@ public class Outputhandler {
     }
 
     /**
-     * Formatiert die Minutenangabe in eine zweistellige Stundenanzeige (modulo 60).
+     * Formatiert eine Minutenangabe als zweistellige Zahl.
      *
-     * @param minuten Die Minutenangabe, die formatiert werden soll.
-     * @return Ein String als zweistellige Anzeige oder ein leerer String bei negativer Eingabe.
+     * @param minuten die Minutenangabe (wird modulo 60 genommen)
+     * @return zweistelliger String oder leerer String bei negativem Wert
      */
     private String formatZeit(int minuten) {
         if (minuten < 0) {
@@ -199,8 +184,8 @@ public class Outputhandler {
     /**
      * Formatiert eine Wartezeit in Klammern.
      *
-     * @param wartezeit Die Wartezeit in Minuten.
-     * @return Ein formatierter String mit eingeklammerter Wartezeit oder ein leerer String, wenn die Wartezeit <= 0 ist.
+     * @param wartezeit die Wartezeit in Minuten
+     * @return formatierter String "(MM)" oder leerer String bei Wert kleiner gleich 0
      */
     private String formatWartezeit(int wartezeit) {
         if (wartezeit <= 0) {

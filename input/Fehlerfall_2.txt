@@ -1,0 +1,7 @@
+Strecke:
+A B
+
+Abstaende:
+2 4
+
+Start Hinfahrt:

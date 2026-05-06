@@ -3,34 +3,43 @@ package Algorithmen;
 import model.DataStructure;
 
 /**
- * Schnittstelle für alle Algorithmen, die Fahrplankollisionen erkennen und/oder auflösen.
+ * Schnittstelle für Fahrplan-Algorithmen zur Kollisionserkennung und -auflösung.
+ * Implementierende Klassen müssen Methoden bereitstellen, um Fahrpläne zu berechnen, Kollisionen zu erkennen und
+ * zeitliche Überschneidungen zu prüfen.
+ *
+ * @see EinfachAlg
+ * @see EinseitigAlg
+ * @see BeidseitigAlg
  */
 public interface Algorithmus {
 
     /**
-     * Führt den jeweiligen Algorithmus auf den Daten aus, um den Fahrplan anzupassen.
+     * Führt den Algorithmus auf der übergebenen Datenstruktur aus.
+     * Je nach Implementierung werden Kollisionen markiert oder durch Anpassung der Wartezeiten aufgelöst.
      *
-     * @param dto Die Eingabedatenstruktur.
-     * @return Die angepasste Datenstruktur mit den neuen Fahrzeiten.
+     * @param dto die Eingabedatenstruktur mit Strecken- und Fahrplandaten
+     * @return die modifizierte Datenstruktur mit angepassten Fahrzeiten und Wartezeiten
      */
     DataStructure algorithmus(DataStructure dto);
 
     /**
-     * Prüft, ob es innerhalb des Fahrplans Kollisionen auf der Strecke gibt.
+     * Prüft, ob der Fahrplan Kollisionen auf der eingleisigen Strecke enthält.
      *
-     * @param dto Die zu prüfende Datenstruktur.
-     * @return True, wenn eine Kollision vorliegt, andernfalls false.
+     * @param dto die zu prüfende Datenstruktur
+     * @return {@code true} wenn mindestens eine Kollision vorliegt, sonst {@code false}
      */
     boolean hatKollision(DataStructure dto);
 
     /**
-     * Überprüft, ob sich zwei Fahrten zeitlich überschneiden.
+     * Überprüft, ob sich zwei Streckenabschnitte zeitlich überschneiden.
+     * Die Berechnung berücksichtigt den Überlauf bei Modulo-60-Zeitangaben (zirkuläre Zeitdarstellung im
+     * Stundenbereich).
      *
-     * @param startHin   Startzeit der Hinfahrt.
-     * @param endeHin    Endzeit der Hinfahrt.
-     * @param startRueck Startzeit der Rückfahrt.
-     * @param endeRueck  Endzeit der Rückfahrt.
-     * @return True, wenn es eine zeitliche Überschneidung gibt.
+     * @param startHin Abfahrtszeit der Hinfahrt in Minuten (0-59)
+     * @param endeHin Ankunftszeit der Hinfahrt inkl. Sicherheitszeit in Minuten (0-59)
+     * @param startRueck Abfahrtszeit der Rückfahrt in Minuten (0-59)
+     * @param endeRueck Ankunftszeit der Rückfahrt in Minuten (0-59)
+     * @return {@code true} wenn eine zeitliche Überschneidung besteht
      */
-    boolean istZeitueberlappend(int startHin, int endeHin, int startRueck, int  endeRueck);
+    boolean istZeitueberlappend(int startHin, int endeHin, int startRueck, int endeRueck);
 }

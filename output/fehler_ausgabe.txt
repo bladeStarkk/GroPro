@@ -1,0 +1,13 @@
+=== FEHLERBERICHT ===
+Kontext: Datei nicht gefunden: 
+Exception: java.io.FileNotFoundException: 
+Stacktrace:
+java.io.FileNotFoundException: 
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:213)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:152)
+	at java.base/java.util.Scanner.<init>(Scanner.java:645)
+	at io.Inputhandler.createDto(Inputhandler.java:33)
+	at Main.run(Main.java:52)
+	at Main.main(Main.java:35)
+=====================

@@ -33,8 +33,8 @@ public class Outputhandler {
         if (dotIndex == -1) {
             outputDateiName = output + "_aus.txt";
         } else {
-            String name = output.substring(0, dotIndex);
-            String endung = output.substring(dotIndex);
+            String name = output.substring(0, dotIndex+1);
+            String endung = output.substring(dotIndex+1);
             outputDateiName = name + "_aus" + endung;
         }
 

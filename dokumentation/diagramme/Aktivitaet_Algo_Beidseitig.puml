@@ -1,0 +1,95 @@
+@startuml Aktivitaet_BeidseitigAlg
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: BeidseitigAlg.algorithmus()
+
+|#E8EAF6|Shift-Optimierung|
+start
+
+if (hatKollision(dto)?) then (nein)
+    :return dto;
+    stop
+else (ja)
+endif
+
+:Initialisiere Suche;
+note right
+  bestShift = 0
+  minWartezeit = MAX_VALUE
+end note
+
+while (für shift = 0 bis 59) is (nächster)
+
+    :Erstelle Testkopie;
+
+    :Verschiebe Rückweg um shift;
+    note right
+      testRueck[j] = (rueck[j] + shift) % 60
+    end note
+
+    :Wende EinseitigAlg an;
+
+    :Summiere Wartezeiten;
+
+    if (wartezeit < minWartezeit?) then (ja)
+        :Aktualisiere Best;
+        note right
+          minWartezeit = wartezeit
+          bestShift = shift
+        end note
+    else (nein)
+    endif
+
+endwhile (fertig)
+
+:Wende bestShift auf dto an;
+
+|#E3F2FD|50/50-Verteilung|
+
+:Hole einseitige Wartezeiten;
+note left
+  EinseitigAlg auf Kopie
+  anwenden, Wartezeiten holen
+end note
+
+:Verteile Wartezeiten;
+note left
+  warteHin[i] = w / 2
+  warteRueck[i] = w - warteHin[i]
+end note
+
+:Berechne Hinweg neu;
+note left
+  Für jeden Bahnhof:
+  zeit += abstand + umstieg + warteHin
+end note
+
+:Berechne Rückweg neu;
+note left
+  Start: letzteAnkunftHin + 1 + bestShift
+  zeit += abstand + umstieg + warteRueck
+end note
+
+:Aktualisiere dto;
+note left
+  gesamtdauerHin = minDauer + warteHinGesamt
+  gesamtdauerRueck = minDauer + warteRueckGesamt
+  strafen = warteHin² + warteRueck²
+end note
+
+:return dto;
+
+stop
+
+@enduml
+

@@ -1,0 +1,8 @@
+Strecke:
+A B C D E F G H I
+
+Abstaende:
+29 29 29 29 29 29 29 29
+
+Start Hinfahrt:
+0

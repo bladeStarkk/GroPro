@@ -1,7 +1,7 @@
 Strecke:
 A B
 
-
+Abstaende:
 4 5 6 7
 
 Start Hinfahrt:

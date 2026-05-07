@@ -1,0 +1,83 @@
+@startuml Aktivitaet_Main
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: Main
+
+start
+
+partition "main(args)" {
+
+    if (args == null oder args.length == 0?) then (ja)
+        :ExceptionHandler.handle(
+        "Kommandozeilenargument fehlt");
+        note right
+          Programm wird mit
+          Exit-Code 1 beendet
+        end note
+        stop
+    else (nein)
+        :ExceptionHandler.setInputFile(args[0]);
+    endif
+
+    :Erstelle Main-Instanz;
+
+    :app.run(args[0]);
+
+}
+
+partition "run(filePath)" {
+
+    :Erstelle Inputhandler;
+
+    :Erstelle Outputhandler;
+
+    :Erstelle File aus filePath;
+
+    :dto = inputhandler.createDto(file);
+    note right
+      Liest Eingabedatei und
+      erstellt Basis-Datenstruktur
+    end note
+
+    :Erstelle Algorithmus-Array
+    [EinfachAlg, EinseitigAlg, BeidseitigAlg];
+
+    :Erstelle Ergebnis-Array
+    [3 DataStructures];
+
+    while (für jeden Algorithmus i = 0..2) is (nächster)
+        :dtoKopie = dto.deepCopy();
+        note right
+          Tiefe Kopie erstellen,
+          damit Original unverändert bleibt
+        end note
+
+        :ergebnisse[i] = strategien[i].algorithmus(dtoKopie);
+    endwhile (fertig)
+
+    :outputhandler.createOutput(
+    ergebnisse[0],
+    ergebnisse[1],
+    ergebnisse[2],
+    filePath);
+    note right
+      Schreibt alle drei
+      Fahrpläne in Ausgabedatei
+    end note
+
+}
+
+stop
+
+@enduml
+

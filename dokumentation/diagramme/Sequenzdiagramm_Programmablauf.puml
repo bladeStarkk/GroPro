@@ -1,0 +1,99 @@
+@startuml Sequenzdiagramm
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam participant {
+    BorderColor #4527A0
+    BackgroundColor #E1D5E7
+}
+
+skinparam sequence {
+    LifeLineBorderColor #4527A0
+}
+
+title Programmablauf: Zugfahrplan-Berechnung
+
+actor Benutzer
+participant "Main" as Main
+participant "ExceptionHandler" as EH
+participant "Inputhandler" as IH
+participant "DataStructure" as DS
+participant "Algorithmus\n<<interface>>" as ALG
+participant "Outputhandler" as OH
+
+' Programmstart
+Benutzer -> Main : main(args)
+activate Main
+
+' Argument-Prüfung
+alt args == null || args.length == 0
+    Main -> EH : handle("Kommandozeilenargument fehlt")
+    activate EH
+    EH -> EH : System.exit(1)
+    deactivate EH
+else args vorhanden
+    Main -> EH : setInputFile(args[0])
+    activate EH
+    EH --> Main
+    deactivate EH
+end
+
+' Hauptlogik starten
+Main -> Main : run(filePath)
+activate Main #E8E8E8
+
+' Eingabe einlesen
+Main -> IH : createDto(file)
+activate IH
+
+IH -> DS : new DataStructure()
+activate DS
+DS --> IH : dto
+deactivate DS
+
+IH -> IH : Datei einlesen & Fahrpläne berechnen
+note right: Befüllt dto mit allen\neingelesenen Daten
+
+IH --> Main : dto
+deactivate IH
+
+' Algorithmen-Array erstellen
+Main -> Main : Algorithmen-Array erstellen
+note right: EinfachAlg, EinseitigAlg, BeidseitigAlg
+
+' Schleife über alle Strategien
+loop für jede Strategie (i = 0 bis 2)
+
+    Main -> DS : deepCopy()
+    activate DS
+    DS --> Main : dtoKopie
+    deactivate DS
+
+    Main -> ALG : algorithmus(dtoKopie)
+    activate ALG
+    note right: Führt jeweilige Strategie aus:\n- Einfache Fahrt\n- Einseitiges Warten\n- Beidseitiges Warten
+    ALG --> Main : ergebnisse[i]
+    deactivate ALG
+
+end
+
+' Ausgabe erstellen
+Main -> OH : createOutput(ergebnisse[], filePath)
+activate OH
+
+OH -> OH : Ausgabedatei schreiben
+note right: Formatiert und schreibt\nalle drei Strategien
+
+OH --> Main : void
+deactivate OH
+
+deactivate Main
+deactivate Main
+
+Main --> Benutzer : Programmende
+
+@enduml
+

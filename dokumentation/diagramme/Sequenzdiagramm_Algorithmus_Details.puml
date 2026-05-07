@@ -1,0 +1,150 @@
+@startuml Sequenzdiagramm_Algorithmen_Detail
+
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+
+skinparam participant {
+    BorderColor #4527A0
+    BackgroundColor #E1D5E7
+}
+
+skinparam sequence {
+    LifeLineBorderColor #4527A0
+}
+
+title Detailablauf: Algorithmen zur Fahrplanoptimierung
+
+participant "Main" as Main
+participant "DataStructure" as DS
+participant "EinfachAlg" as EA
+participant "EinseitigAlg" as EiA
+participant "BeidseitigAlg" as BA
+
+== EinfachAlg (Strategie 1) ==
+
+Main -> DS : deepCopy()
+activate DS
+DS --> Main : dtoKopie
+deactivate DS
+
+Main -> EA : algorithmus(dto)
+activate EA
+
+EA -> EA : hatKollision(dto)
+activate EA #E8E8E8
+note right: Prüft für jeden Hinweg-Zeitpunkt,\nob ein Rückweg-Zug im\ngleichen Streckenabschnitt ist
+EA --> EA : true/false
+deactivate EA
+
+alt Kollision vorhanden
+    EA -> EA : Markiere Kollision im dto
+end
+
+EA --> Main : dto (unverändert, nur Kollisionsstatus)
+deactivate EA
+
+== EinseitigAlg (Strategie 2) ==
+
+Main -> DS : deepCopy()
+activate DS
+DS --> Main : dtoKopie
+deactivate DS
+
+Main -> EiA : algorithmus(dto)
+activate EiA
+
+loop solange Kollision vorhanden
+
+    EiA -> EiA : hatKollision(dto)
+    activate EiA #E8E8E8
+
+    loop für jeden Hinweg-Zeitpunkt
+        loop für jeden Rückweg-Zeitpunkt
+            EiA -> EiA : istZeitueberlappend(hinStart, hinEnde, rueckStart, rueckEnde)
+            note right: Prüft ob sich zwei Züge\nzeitlich auf der Strecke überlappen
+        end
+    end
+
+    EiA --> EiA : Kollisionsstatus
+    deactivate EiA
+
+    alt Kollision gefunden
+        EiA -> EiA : Verschiebe Rückweg um errechnete Differenz
+        EiA -> EiA : Erhöhe Wartezeit Rückweg um Differenz
+        note right: Nur der Rückweg wird angepasst,\nHinweg bleibt unverändert
+    end
+
+end
+
+EiA --> Main : dto (mit angepasstem Rückweg)
+deactivate EiA
+
+== BeidseitigAlg (Strategie 3) ==
+
+Main -> DS : deepCopy()
+activate DS
+DS --> Main : dtoKopie
+deactivate DS
+
+Main -> BA : algorithmus(dto)
+activate BA
+
+BA -> BA : hatKollision(dto)
+note right: Initiale Kollisionsprüfung
+
+alt keine Kollision
+    BA --> Main : dto (unverändert)
+else Kollision vorhanden
+
+    BA -> BA : Suche optimalen Startversatz
+    activate BA #E8E8E8
+
+    loop shift = 0 bis 59 Minuten
+        BA -> DS : deepCopy()
+        activate DS
+        DS --> BA : testDto
+        deactivate DS
+
+        BA -> BA : Verschiebe Hinweg um 'shift' Minuten
+
+        BA -> EiA : algorithmus(testDto)
+        activate EiA
+        note right: Nutzt EinseitigAlg\nzur Kollisionsauflösung
+        EiA --> BA : testDto
+        deactivate EiA
+
+        BA -> BA : Berechne Gesamtwartezeit
+        BA -> BA : Merke besten Shift falls Wartezeit minimal
+    end
+
+    BA --> BA : optimaler Shift gefunden
+    deactivate BA
+
+    BA -> DS : deepCopy()
+    activate DS
+    DS --> BA : finalDto
+    deactivate DS
+
+    BA -> BA : Wende optimalen Shift auf Hinweg an
+
+    BA -> EiA : algorithmus(finalDto)
+    activate EiA
+    EiA --> BA : finalDto
+    deactivate EiA
+
+    BA -> BA : Verteile Wartezeit 50/50
+    note right: Gesamtwartezeit wird gleichmäßig\nauf Hin- und Rückweg aufgeteilt
+
+    BA -> BA : Aktualisiere dto mit finalen Werten
+    note right: Setzt finale Abfahrtszeiten\nund Wartezeiten für beide Richtungen
+
+end
+
+BA --> Main : dto (mit optimiertem Fahrplan)
+deactivate BA
+
+@enduml
+

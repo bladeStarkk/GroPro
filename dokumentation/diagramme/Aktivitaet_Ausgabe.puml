@@ -1,0 +1,80 @@
+@startuml Aktivitaet_Outputhandler
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: Outputhandler.createOutput()
+
+|#E8EAF6|Initialisierung|
+start
+
+:Ermittle Ausgabepfad;
+note right
+  "input/" → "output/"
+  name + "_aus" + endung
+end note
+
+:Erstelle PrintWriter;
+
+if (IOException?) then (ja)
+    :Fehlerbehandlung; <<#FF6B6B>>
+    stop
+else (nein)
+endif
+
+|#E3F2FD|Ausgabe schreiben|
+
+:Schreibe Eingabedaten;
+note left
+  - Strecke (Bahnhofsnamen)
+  - Abstände (Fahrzeiten)
+  - Start Hinfahrt
+end note
+
+:Schreibe Streckeninfos;
+note left
+  - Anzahl Bahnhöfe
+  - Mindestdauer
+end note
+
+while (für jeden Algorithmus) is (nächster)
+    note right
+      1. Einfache Fahrt
+      2. Einseitiges Warten
+      3. Beidseitiges Warten
+    end note
+
+    :druckeTabelle(dto);
+    note left
+      Zeilen: An, Wa, Ab,
+      Bahnhöfe (+ Kollisionen),
+      Ab, Wa, An
+
+      formatZeit(): "MM"
+      formatWartezeit(): "(MM)"
+    end note
+
+    :Schreibe Metriken;
+    note left
+      - Gesamtdauer Hin/Rück
+      - Summe Wartezeiten
+      - Summe Strafen
+    end note
+endwhile (fertig)
+
+:Schließe PrintWriter;
+
+:Konsolenausgabe Erfolg;
+
+stop
+
+@enduml
+

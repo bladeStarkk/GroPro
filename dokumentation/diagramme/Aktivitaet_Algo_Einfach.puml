@@ -1,0 +1,56 @@
+@startuml Aktivitaet_EinfachAlg
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: EinfachAlg.algorithmus()
+
+start
+
+:Initialisiere kollisionen[];
+note right
+  Größe: anzahl - 1
+  (ein Eintrag pro Streckenabschnitt)
+end note
+
+if (hatKollision(dto)?) then (ja)
+
+    while (für jeden Streckenabschnitt i) is (nächster)
+
+        :Ermittle Zeitfenster;
+        note right
+          startHin = hinweg[i*2]
+          endeHin = hinweg[i*2+1]
+          startRueck = rueckweg[i*2+1]
+        end note
+
+        if (Zeitüberlappung?) then (ja)
+            :kollisionen[i] = "x";
+        else (nein)
+        endif
+
+    endwhile (fertig)
+
+else (nein)
+endif
+
+:dto.setKollisionen(kollisionen);
+
+:return dto;
+note right
+  Fahrplan bleibt unverändert,
+  nur Kollisionen markiert
+end note
+
+stop
+
+@enduml
+

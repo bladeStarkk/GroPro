@@ -1,0 +1,140 @@
+@startuml Sequenzdiagramm_Outputhandler
+
+skinparam backgroundColor #FAFAFA
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
+skinparam maxmessagesize 200
+skinparam style strictuml
+
+skinparam participant {
+    BackgroundColor #E1D5E7
+    BorderColor #4527A0
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Sequenzdiagramm: Outputhandler.createOutput()
+
+actor "Main" as main
+participant "Outputhandler" as out
+participant "PrintWriter" as writer
+participant "dto\n:DataStructure" as dto
+participant "ExceptionHandler" as ex
+
+== Initialisierung ==
+
+main -> out : createOutput(dtoEinfach, dtoEinseitig, dtoBeidseitig, inputDatei)
+activate out
+
+out -> out : outputDateiName ermitteln
+note right
+  Aus inputDatei wird der
+  Ausgabepfad abgeleitet:
+  "input/" → "output/"
+  Name + "_aus" + Endung
+end note
+
+out -> writer ** : new PrintWriter(outputDateiName)
+activate writer
+
+== Eingabedaten reproduzieren ==
+
+out -> dto : Lese Eingabedaten
+activate dto
+dto --> out : Daten
+deactivate dto
+
+out -> writer : Schreibe Eingabedaten
+note right of writer
+  Ausgabe:
+  - "Strecke:" + Bahnhofsnamen
+  - "Abstaende:" + Fahrzeiten
+  - "Start Hinfahrt:" + Startzeit
+end note
+
+== Allgemeine Informationen ==
+
+out -> dto : Lese Streckeninfos
+activate dto
+dto --> out : Daten
+deactivate dto
+
+out -> writer : Schreibe Streckeninfos
+note right of writer
+  Ausgabe:
+  - "Anzahl Bahnhöfe : " + anzahl
+  - "Mindestdauer    : " + minDauer
+end note
+
+== Fahrplan-Tabellen ausgeben ==
+
+loop für jeden Algorithmus [Einfach, Einseitig, Beidseitig]
+    note right of out
+      Dieser Abschnitt wird für jeden der
+      drei Algorithmen durchlaufen:
+      1. Einfache Fahrt
+      2. Einseitiges Warten
+      3. Beidseitiges Warten
+    end note
+
+    out -> writer : println(algorithmusName + ":")
+    out -> out : druckeTabelle(writer, dto)
+    activate out #LightBlue
+
+        out -> dto : Lese Fahrplandaten
+        activate dto
+        dto --> out : Fahrplandaten
+        deactivate dto
+
+        loop für jede Tabellenzeile [An, Wa, Ab, Bahnhöfe, Ab, Wa, An]
+            out -> out : formatZeit(minuten)
+            out -> out : formatWartezeit(wartezeit)
+            out -> writer : printf(formatierteZeile)
+        end
+
+
+        out -> dto : Lese Metriken
+        activate dto
+        dto --> out : Metriken
+        deactivate dto
+
+        out -> writer : Schreibe Metriken
+        note right of writer
+          Ausgabe:
+          - Gesamtdauer Hin/Rück
+          - Summe Wartezeiten
+          - Summe Strafen
+        end note
+
+    deactivate out
+end
+
+== Abschluss ==
+
+out -> writer : close()
+destroy writer
+
+out --> main : void
+note right: Konsolenausgabe:\n"Output erfolgreich generiert: " + outputDateiName
+
+deactivate out
+
+== Fehlerfall ==
+
+alt IOException beim Schreiben
+    out -> ex : handle(e, "Fehler beim Schreiben...")
+    activate ex
+    note right of ex
+      Fehlerbehandlung:
+      1. Fehlermeldung auf Console
+      2. Fehlerbericht in Datei
+      3. Programmabbruch (exit 1)
+    end note
+    deactivate ex
+end
+
+@enduml
+

@@ -1,3 +1,3 @@
 === FEHLERBERICHT ===
-Kontext: Logikfehler: Die Anzahl der Abstände (1) muss genau der Anzahl der Bahnhöfe minus 1 (0) entsprechen.
+Kontext: Fehler: Es müssen mindestens 2 Bahnhöfe in der Strecke angegeben sein.
 =====================

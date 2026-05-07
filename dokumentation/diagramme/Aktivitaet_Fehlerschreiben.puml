@@ -1,0 +1,75 @@
+@startuml Aktivitaet_ExceptionHandler
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: Fehlerbericht schreiben
+
+|Main|
+
+:... Programmablauf ...;
+
+:Fehler tritt auf;
+
+:ExceptionHandler.handle(e, context);
+
+|ExceptionHandler|
+
+partition "handle(Exception e, String context)" {
+
+    :Ausgabe auf System.err:
+    "KRITISCHER FEHLER: " + context;
+
+    if (e != null?) then (ja)
+        :Ausgabe auf System.err:
+        "Fehlermeldung: " + e.getMessage();
+    endif
+
+    :Ausgabe auf System.err:
+    "Programmabbruch. Fehlerbericht wird
+    geschrieben in: " + outputDateiName;
+
+    partition "Fehlerbericht schreiben" {
+
+        :Erstelle PrintWriter(outputDateiName);
+
+        :Schreibe "=== FEHLERBERICHT ===";
+
+        :Schreibe "Kontext: " + context;
+
+        if (e != null?) then (ja)
+            :Schreibe "Exception: " + e;
+            :Schreibe "Stacktrace:";
+            :e.printStackTrace(writer);
+        endif
+
+        :Schreibe "=====================";
+
+        :Schließe PrintWriter;
+    }
+
+    if (IOException beim Schreiben?) then (ja)
+        :Ausgabe auf System.err:
+        "Zusätzlicher Fehler beim
+        Schreiben der Datei";
+    endif
+
+    :System.exit(1);<<#FF6B6B>>
+    note right
+      Programm wird mit
+      Exit-Code 1 beendet
+    end note
+}
+
+stop
+
+@enduml
+

@@ -2,7 +2,7 @@ Strecke:
 A
 
 Abstaende:
-0
+10
 
 Start Hinfahrt:
 10

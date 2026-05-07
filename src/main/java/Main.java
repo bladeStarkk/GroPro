@@ -3,7 +3,7 @@ import Algorithmen.Algorithmus;
 import Algorithmen.BeidseitigAlg;
 import Algorithmen.EinfachAlg;
 import Algorithmen.EinseitigAlg;
-import io.ExceptionHandler;
+import io.Exceptionhandler;
 import io.Inputhandler;
 import io.Outputhandler;
 import model.DataStructure;
@@ -26,15 +26,15 @@ public class Main {
      */
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
-            ExceptionHandler.handle("Kommandozeilenargument für den Dateipfad fehlt.");
+            Exceptionhandler.handle("Kommandozeilenargument für den Dateipfad fehlt.");
         } else {
-            ExceptionHandler.setInputFile(args[0]);
+            Exceptionhandler.setInputFile(args[0]);
         }
         try {
             Main app = new Main();
             app.run(args[0]);
         } catch (Exception e) {
-            ExceptionHandler.handle(e, "Unerwarteter Fehler im Programmablauf.");
+            Exceptionhandler.handle(e, "Unerwarteter Fehler im Programmablauf.");
         }
     }
 

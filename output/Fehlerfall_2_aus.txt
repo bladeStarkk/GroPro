@@ -1,3 +1,10 @@
 === FEHLERBERICHT ===
-Kontext: Logikfehler: Die Anzahl der Abstände (2) muss genau der Anzahl der Bahnhöfe minus 1 (1) entsprechen.
+Kontext: Formatfehler: Die Datei ist unvollständig oder hat nicht die erwartete Anzahl an Zeilen.
+Exception: java.util.NoSuchElementException: No line found
+Stacktrace:
+java.util.NoSuchElementException: No line found
+	at java.base/java.util.Scanner.nextLine(Scanner.java:1660)
+	at io.Inputhandler.createDto(Inputhandler.java:111)
+	at Main.run(Main.java:52)
+	at Main.main(Main.java:35)
 =====================

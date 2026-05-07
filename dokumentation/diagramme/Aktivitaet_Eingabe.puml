@@ -1,0 +1,113 @@
+@startuml Aktivitaet_Inputhandler
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: Inputhandler.createDto()
+
+|#E8EAF6|Einlesen & Validierung|
+start
+
+:Initialisierung;
+note right
+  - new DataStructure()
+  - new Scanner(file)
+end note
+
+if (Datei nicht lesbar?) then (ja)
+    :Fehlerbehandlung; <<#FF6B6B>>
+    note right: FileNotFoundException / Datei leer
+    stop
+else (nein)
+endif
+
+:Lese und validiere Strecke;
+note right
+  - Parse Bahnhofsnamen
+  - Prüfe: nicht leer, anzahl ≥ 2
+end note
+
+if (Streckenfehler?) then (ja)
+    :Fehlerbehandlung; <<#FF6B6B>>
+    stop
+else (nein)
+endif
+
+:Lese und validiere Abstände;
+note right
+  - Parse int[] aus Zeile
+  - Prüfe: Anzahl = Bahnhöfe - 1
+end note
+
+if (Abstandsfehler?) then (ja)
+    :Fehlerbehandlung; <<#FF6B6B>>
+    stop
+else (nein)
+endif
+
+while (für jeden Abstand) is (nächster)
+    if (Ungültig?) then (ja)
+        :Fehlerbehandlung; <<#FF6B6B>>
+        note right
+          Ganzzahl, > 0,
+          ≤ 30 - sicherheitszeit
+        end note
+        stop
+    else (nein)
+    endif
+endwhile (fertig)
+
+:Setze abstaende, minDauer;
+
+:Überspringe Leerzeile und "Start Hinfahrt:";
+
+:Lese und validiere Startzeit;
+note left
+  - Parse int
+  - Prüfe: ≥ 0
+end note
+
+if (Startfehler?) then (ja)
+    :Fehlerbehandlung; <<#FF6B6B>>
+    stop
+else (nein)
+endif
+
+:Berechne Hin- und Rückweg;
+note left
+  Hinweg: start → Ende
+  Rückweg: Ende + umstiegszeit → start
+
+  Je Bahnhof:
+  ankunft = (abfahrt von vorherigem Bahnhof + abstand) % 60
+  abfahrt = (ankunft + umstiegszeit) % 60
+end note
+
+:Initialisiere und setze Werte;
+note left
+  kollisionen[], wartezeiten[],
+  gesamtdauern
+  strafen = 0,
+end note
+
+:Schließe Scanner;
+
+if (NoSuchElementException?) then (ja)
+    :Fehlerbehandlung; <<#FF6B6B>>
+    stop
+else (nein)
+endif
+
+:return dto;
+
+stop
+
+@enduml

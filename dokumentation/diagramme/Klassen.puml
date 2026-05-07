@@ -1,0 +1,124 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName Arial
+skinparam ArrowColor #444444
+skinparam linetype ortho
+skinparam style strictuml
+
+skinparam class {
+    BorderColor #4527A0
+    HeaderBackgroundColor #E1D5E7
+}
+
+top to bottom direction
+
+package "io" {
+    class Inputhandler {
+        -dto: DataStructure
+        --
+        +createDto(file: File): DataStructure
+    }
+
+    class Outputhandler {
+        --
+        +createOutput(dtoEinfach: DataStructure, dtoEinseitig: DataStructure, dtoBeidseitig: DataStructure, inputDatei: String): void
+        -druckeTabelle(writer: PrintWriter, dto: DataStructure): void
+        -formatZeit(minuten: int): String
+        -formatWartezeit(wartezeit: int): String
+    }
+
+    class ExceptionHandler {
+        -{static} outputDateiName: String
+        --
+        +{static} setInputFile(inputDatei: String): void
+        +{static} handle(e: Exception, context: String): void
+        +{static} handle(errorMessage: String): void
+    }
+
+    Inputhandler -[hidden]up-> Outputhandler
+    Outputhandler -[hidden]down-> ExceptionHandler
+}
+
+class Main {
+    --
+    +{static} main(args: String[]): void
+    -run(filePath: String): void
+}
+
+package "model" {
+    class DataStructure {
+        -strecke: String[]
+        -abstaende: int[]
+        -start: int
+        -anzahl: int
+        -minDauer: int
+        -hinweg: int[]
+        -rueckweg: int[]
+        -umstiegszeit: int
+        -sicherheitszeit: int
+        -kollisionen: String[]
+        -wartezeitHin: int[]
+        -wartezeitRueck: int[]
+        -strafen: int
+        -gesamtdauerHin: int
+        -gesamtdauerRueck: int
+        --
+        +deepCopy(): DataStructure
+    }
+}
+
+package "Algorithmen" {
+    interface Algorithmus {
+        --
+        +algorithmus(dto: DataStructure): DataStructure
+        +hatKollision(dto: DataStructure): boolean
+        +istZeitueberlappend(startHin: int, endeHin: int, startRueck: int, endeRueck: int): boolean
+    }
+
+    class EinfachAlg {
+        --
+        +algorithmus(dto: DataStructure): DataStructure
+        +hatKollision(dto: DataStructure): boolean
+        +istZeitueberlappend(startHin: int, endeHin: int, startRueck: int, endeRueck: int): boolean
+    }
+
+    class BeidseitigAlg {
+        --
+        +algorithmus(dto: DataStructure): DataStructure
+        +hatKollision(dto: DataStructure): boolean
+        +istZeitueberlappend(startHin: int, endeHin: int, startRueck: int, endeRueck: int): boolean
+    }
+
+    class EinseitigAlg {
+        --
+        +algorithmus(dto: DataStructure): DataStructure
+        +hatKollision(dto: DataStructure): boolean
+        +istZeitueberlappend(startHin: int, endeHin: int, startRueck: int, endeRueck: int): boolean
+    }
+
+    EinfachAlg -[hidden]up-> BeidseitigAlg
+    BeidseitigAlg -[hidden]up-> EinseitigAlg
+
+    EinfachAlg -up-|> Algorithmus
+    BeidseitigAlg -up-|> Algorithmus
+    EinseitigAlg -up-|> Algorithmus
+
+    BeidseitigAlg -right-> EinseitigAlg : nutzt
+}
+
+Inputhandler -[hidden]down-> Main
+Outputhandler -[hidden]down-> DataStructure
+DataStructure -[hidden]down-> Algorithmus
+
+Main -up-> Inputhandler
+Main -up-> Outputhandler
+Main -up-> ExceptionHandler
+
+Inputhandler -down-> DataStructure : erstellt
+Outputhandler -down-> DataStructure : gibt aus
+
+Main -down-> Algorithmus : nutzt
+Algorithmus -up-> DataStructure : verarbeitet
+
+@enduml

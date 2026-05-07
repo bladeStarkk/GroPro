@@ -2,7 +2,6 @@ package io;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import model.DataStructure;
 
 /**
@@ -69,10 +68,9 @@ public class Outputhandler {
             druckeTabelle(writer, dtoBeidseitig);
 
             System.out.println("Output erfolgreich generiert: " + outputDateiName);
-            System.out.println(Arrays.toString(dtoEinfach.getKollisionen()));
 
         } catch (IOException e) {
-            ExceptionHandler.handle(e, "Fehler beim Schreiben der Ausgabedatei");
+            Exceptionhandler.handle(e, "Fehler beim Schreiben der Ausgabedatei");
         }
     }
 

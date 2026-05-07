@@ -1,0 +1,76 @@
+@startuml Aktivitaet_EinseitigAlg
+
+skinparam backgroundColor #FAFAFA
+skinparam ActivityBackgroundColor #E1D5E7
+skinparam ActivityBorderColor #4527A0
+skinparam ArrowColor #444444
+skinparam style strictuml
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Aktivitätsdiagramm: EinseitigAlg.algorithmus()
+
+start
+
+:Initialisierung;
+note right
+  warteZeitenRueck[] = new int[anzahl]
+  Hole hinweg[], rueckweg[], sicherheitszeit
+end note
+
+while (hatKollision(dto)?) is (ja)
+
+    :Finde alle Kollisionen;
+    note right
+      Für jeden Abschnitt i:
+      Prüfe istZeitueberlappend()
+      Markiere in kollisionen[]
+    end note
+
+    :Finde letzte Kollision;
+    note right
+      Iteriere rückwärts durch
+      kollisionen[] bis Fund
+    end note
+
+    :Berechne Wartezeit;
+    note right
+      diff = (sicherheitHin - startRueck + 60) % 60
+      Falls diff == 0: diff = 1
+    end note
+
+    :Addiere Wartezeit;
+    note right
+      warteZeitenRueck[i+1] += diff
+    end note
+
+    :Verschiebe Rückweg;
+    note right
+      Alle Zeiten von Position
+      2*i+1 bis 0 um diff erhöhen
+      (modulo 60)
+    end note
+
+endwhile (nein)
+
+:Berechne Gesamtwartezeit;
+note right
+  Summiere alle
+  warteZeitenRueck[i]
+end note
+
+:Aktualisiere dto;
+note right
+  gesamtdauerRueck += wartezeitGesamt
+  strafen = wartezeitGesamt²
+end note
+
+:return dto;
+
+stop
+
+@enduml
+

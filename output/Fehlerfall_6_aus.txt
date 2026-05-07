@@ -1,0 +1,3 @@
+=== FEHLERBERICHT ===
+Kontext: Wertefehler: Ein Abstand darf nicht kleiner oder gleich 0 sein (Gefunden: 0).
+=====================

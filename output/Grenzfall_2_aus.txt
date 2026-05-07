@@ -1,0 +1,51 @@
+Strecke:
+A B C D E F G H I
+
+Abstaende:
+29 29 29 29 29 29 29 29
+
+Start Hinfahrt:
+0
+
+Anzahl Bahnhöfe : 9
+Mindestdauer    : 239
+
+Einfache Fahrt:
+An        29    59    29    59    29    59    29    59    
+Wa                                                       
+Ab  00    30    00    30    00    30    00    30          
+    A     B     C     D     E     F     G     H     I     
+Ab        30    00    30    00    30    00    30    00    
+Wa                                                       
+An  59    29    59    29    59    29    59    29          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 239, 239
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+
+Einseitiges Warten:
+An        29    59    29    59    29    59    29    59    
+Wa                                                       
+Ab  00    30    00    30    00    30    00    30          
+    A     B     C     D     E     F     G     H     I     
+Ab        30    00    30    00    30    00    30    00    
+Wa                                                       
+An  59    29    59    29    59    29    59    29          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 239, 239
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+
+Beidseitiges Warten:
+An        29    59    29    59    29    59    29    59    
+Wa                                                       
+Ab  00    30    00    30    00    30    00    30          
+    A     B     C     D     E     F     G     H     I     
+Ab        30    00    30    00    30    00    30    00    
+Wa                                                       
+An  59    29    59    29    59    29    59    29          
+
+Gesamtdauer Hinfahrt, Rückfahrt       : 239, 239
+Summe Wartezeiten Hinfahrt, Rückfahrt : 0, 0
+Summe Strafen                         : 0
+

@@ -1,0 +1,166 @@
+@startuml Sequenzdiagramm_Inputhandler
+
+skinparam backgroundColor #FAFAFA
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
+skinparam maxmessagesize 200
+skinparam style strictuml
+
+skinparam participant {
+    BackgroundColor #E1D5E7
+    BorderColor #4527A0
+}
+
+skinparam note {
+    BackgroundColor #FFFDE7
+    BorderColor #FBC02D
+}
+
+title Sequenzdiagramm: Inputhandler.createDto()
+
+actor "Main" as main
+participant "Inputhandler" as in
+participant "Scanner" as scanner
+participant "dto\n:DataStructure" as dto
+participant "ExceptionHandler" as ex
+
+== Datei einlesen ==
+
+main -> in : createDto(file)
+activate in
+
+in -> dto ** : new DataStructure()
+activate dto
+
+in -> scanner ** : new Scanner(file)
+activate scanner
+
+alt FileNotFoundException
+    in -> ex : handle(e, "Datei nicht gefunden...")
+    activate ex
+    note right of ex
+      Programmabbruch mit Fehlerbericht in Datei
+    end note
+    deactivate ex
+end
+
+in -> scanner : Lese Strecke
+activate scanner
+note right of scanner
+Prüfe ob Datei leer
+Lese Streckendaten
+end note
+scanner --> in : streckenZeile
+deactivate scanner
+
+alt Datei/Streckenliste ist leer/\nweniger als 2 Strecken
+    in -> ex : handle("Fehler...")
+end
+
+in -> dto : Setze Streckendaten
+
+in -> scanner : Lese Abstände
+activate scanner
+note right of scanner
+Lese Abstandswerte
+end note
+scanner --> in : abstaendeZeile
+deactivate scanner
+
+alt Validierungsfehler
+    in -> ex : handle("Fehler...")
+    note right of ex
+      Mögliche Fehler:
+      - Liste leer
+      - Anzahl falsch
+      - Keine Ganzzahl
+      - Wert negativ
+      - Wert zu groß
+    end note
+end
+
+loop für jeden Abstand [Validierung & Summierung]
+    in -> in : Validiere und summiere
+end
+
+in -> dto : Setze Abstandsdaten
+
+in -> scanner : Lese Startzeit
+activate scanner
+note right of scanner
+Lese Startwert
+end note
+scanner --> in : startZeile
+deactivate scanner
+
+alt Validierungsfehler
+    in -> ex : handle("Fehler...")
+    note right of ex
+      Mögliche Fehler:
+      - Keine Ganzzahl
+      - Wert negativ
+    end note
+end
+
+in -> dto : setStart(start)
+
+== Werte setzen ==
+
+in -> dto : Prüfe und setze Umstiegszeit
+note right of dto
+  Falls umstiegszeit noch nicht gesetzt:
+  - setUmstiegszeit(1)
+  Sonst:
+  - verwende vorhandenen Wert
+end note
+
+in -> in : Berechne Hinweg
+note right of in
+  Array-Größe: anzahl * 2 - 2
+  Format: [Abfahrt0, Ankunft1,
+           Abfahrt1, Ankunft2, ...]
+end note
+
+in -> dto : setHinweg(hinweg)
+
+in -> in : Berechne Rückweg
+note right of in
+  Array-Größe: anzahl * 2 - 2
+  Start: (letzteAnkunftHin + 1) % 60
+end note
+
+in -> dto : setRueckweg(rueckweg)
+
+in -> dto : Initialisiere Arrays
+
+in -> in : Berechne Gesamtdauern
+note right of in
+  Für jeden Streckenabschnitt:
+  gesamtdauer += abstand + wartezeit
+end note
+
+in -> dto : Setze Dauern und Standardwerte
+
+in -> scanner : close()
+destroy scanner
+
+in --> main : dto
+deactivate dto
+deactivate in
+
+== Fehlerfall ==
+
+alt NoSuchElementException
+    in -> ex : handle(e, "Formatfehler: Datei unvollständig")
+    activate ex
+    note right of ex
+      Fehlerbehandlung:
+      1. Fehlermeldung auf Console
+      2. Fehlerbericht in Datei
+      3. Programmabbruch (exit 1)
+    end note
+    deactivate ex
+end
+
+@enduml
+
